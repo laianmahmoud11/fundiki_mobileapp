@@ -1,4 +1,3 @@
-import { styles } from '@/styles/homeStyles';
 import { Feather, Ionicons, SimpleLineIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { Text, TouchableOpacity, View } from 'react-native';
@@ -54,17 +53,32 @@ export default function BottomNav({
   }
 
   return (
-    <View style={styles.bottomNav}>
+    <View
+      style={{
+        backgroundColor: '#FFFFFF',
+        borderTopColor: '#DCE4FF',
+        borderTopWidth: 1,
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        paddingBottom: 10,
+        paddingHorizontal: 8,
+        paddingTop: 10,
+      }}
+    >
       {navItems.map((item) => (
         <TouchableOpacity
           key={item}
-          style={styles.navItem}
+          style={{ alignItems: 'center', gap: 4 }}
           activeOpacity={0.85}
           onPress={() => handleNavigation(item)}
         >
           <BottomBarIcon item={item} active={item === activeItem} />
           <Text
-            style={[styles.navLabel, item === activeItem ? styles.navLabelActive : null]}
+            style={{
+              color: '#101010',
+              fontFamily: 'Poppins_500Medium',
+              fontSize: 12,
+            }}
           >
             {item}
           </Text>

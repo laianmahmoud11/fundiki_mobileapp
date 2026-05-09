@@ -10,7 +10,7 @@ import { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { ActivityIndicator, MD2Colors } from 'react-native-paper';
 import { SafeAreaView } from "react-native-safe-area-context";
-export default function hotelList () { 
+export default function HotelList () { 
 
   const { data, isLoading, error } = useQuery({
         queryKey: ["hotelList"],

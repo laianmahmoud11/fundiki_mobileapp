@@ -1,4 +1,4 @@
-export type BookingStatus = 'pending' | 'confirmed' | 'completed' | 'cancelled';
+export type BookingStatus = 'active' | 'pending' | 'confirmed' | 'completed' | 'cancelled';
 
 export type Booking = {
   id: string;
@@ -6,9 +6,13 @@ export type Booking = {
   hotelId: string;
   hotelName: string;
   city: string;
+  country?: string;
   image: string;
   dateFrom: string;
   dateTo: string;
+  checkInDate?: string;
+  checkOutDate?: string;
+  checkInTime?: string;
   rooms: number;
   guests: number;
   status: BookingStatus;

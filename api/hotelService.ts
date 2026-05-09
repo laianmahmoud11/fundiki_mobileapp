@@ -1,6 +1,5 @@
- 
- import ApiBase from './ApiBase';
- 
+ import ApiBase from '@/api/ApiBase';
+
  
  export const getHotel=async()=>{
  const response = await ApiBase.get('/api/v1/hotelList');
