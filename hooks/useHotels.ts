@@ -1,16 +1,10 @@
-import { getHotel } from '@/api/hotelService';
+import { gethotels } from '@/services/firebasehotelSource';
 import { useQuery } from '@tanstack/react-query';
 
-export function useWeekendDeals() {
-  return useQuery({
-    queryKey: ['weekend-deals'],
-    queryFn: getHotel,
-  });
-}
 
-export function usePopularHotels() {
-  return useQuery({
-    queryKey: ['popular-hotels'],
-    queryFn: getHotel,
-  });
+export const useHotels = () => {
+    return useQuery({
+        queryKey: ["products"],
+        queryFn: gethotels,
+    })
 }

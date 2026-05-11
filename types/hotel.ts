@@ -1,9 +1,21 @@
+
+
 export type Hotel = {
-  id: string;
+      id: string;
   name: string;
   city: string;
   country: string;
+  street: string;
   image: string;
-  pricePerNight?: number;
-  rating?: number;
+  price?: number;
+  description: string;
+  starRating: number;
+  oldPrice: string;
+  newPrice: string;
+   reviewText: string;
+  reviews: string;
+  badge: string | null;
+  nights: string;
+isWeekendDeal:boolean;
+hasDiscount : boolean;
 };

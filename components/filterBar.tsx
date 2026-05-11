@@ -48,8 +48,8 @@ const FilterBar = ({FilterPrice,FilterRating,sortNameAToZ,sortNameZToA,sortRatin
           onDismiss={closeFilter}
           anchor={<Button style={{ backgroundColor:"#ffff", margin:5}} icon="filter" onPress={openFilter}>Filter</Button>}>
             <Menu.Item onPress={() => {FilterPrice(null),FilterRating(null)}} title="All" />
-          <Menu.Item onPress={() => {FilterPrice(200)}} title="hotels price Under 200$" />
-          <Menu.Item onPress={() => {FilterPrice(100)}} title="hotels price Under 100$" />
+          <Menu.Item onPress={() => {FilterPrice(500)}} title="hotels price Under 500$" />
+          <Menu.Item onPress={() => {FilterPrice(300)}} title="hotels price Under 300$" />
           <Divider />
     <Menu.Item onPress={() => {FilterRating(5)}} title="hotels 5 Stars" />
         <Menu.Item onPress={() => {FilterRating(4)}} title="hotels 4 Stars" />

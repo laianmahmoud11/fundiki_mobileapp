@@ -9,7 +9,7 @@ import {
   where,
 } from 'firebase/firestore';
 import { Booking, CreateBookingPayload } from '../../types/booking';
-import { db } from './firebaseconfig';
+import { db } from '../firebaseconfig';
 
 function mapBooking(docSnap: any): Booking {
   const data = docSnap.data();

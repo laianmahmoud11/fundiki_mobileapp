@@ -1,11 +1,11 @@
 import StorageService from "@/services/StorageService";
+import { AppUser } from "@/types/user";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
 } from "firebase/auth";
-import { AppUser } from '../types/user';
 import { getCurrentUserFromFirebase } from './firebase/firebaseAuthSource';
-import { auth } from './firebase/firebaseconfig';
+import { auth } from './firebaseconfig';
 
 const initAuth = () => {
   return auth;

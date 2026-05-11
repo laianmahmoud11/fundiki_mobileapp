@@ -1,5 +1,5 @@
 import { AppUser } from '../../types/user';
-import { auth } from './firebaseconfig';
+import { auth } from '../firebaseconfig';
 
 export async function getCurrentUserFromFirebase(): Promise<AppUser | null> {
   const user = auth.currentUser;

@@ -1,9 +1,10 @@
-import { getHotel } from "@/api/hotelService";
+//import { getHotel } from "@/api/hotelService";
 import Message from "@/components/Banner";
 import FilterBar from "@/components/filterBar";
 import HotelListCard from "@/components/hotelList-card";
 import TopBarNavigation from "@/components/Topbar";
 import InputSearch from "@/components/ui/inputSearch";
+import { gethotels } from "@/services/firebasehotelSource";
 import { useQuery } from "@tanstack/react-query";
 import * as React from 'react';
 import { useEffect, useState } from "react";
@@ -12,14 +13,15 @@ import { ActivityIndicator, MD2Colors } from 'react-native-paper';
 import { SafeAreaView } from "react-native-safe-area-context";
 export default function HotelList () { 
 
-  const { data, isLoading, error } = useQuery({
+  const { data=[], isLoading, error } = useQuery({
         queryKey: ["hotelList"],
-        queryFn: getHotel,
+        queryFn: gethotels,
+        
     })
 
 
  const [search, setSearch] = useState("");
-     const [newData, setNewData] = useState([]);
+     const [newData, setNewData] = useState<any[]>([]);
  
         const [price, setPrice] = useState(null);
         const [rating, setRating] = useState(null);
@@ -43,9 +45,9 @@ export default function HotelList () {
 
   useEffect(() => {
 setNewData(data?.filter((hotels: any) =>{
-        const filterSearch= (  search === "" ||hotels.country.toLowerCase().includes(search.toLowerCase())||  hotels.city.toLowerCase().includes(search.toLowerCase())||hotels.name.toLowerCase().includes(search.toLowerCase()));  
+        const filterSearch= (  search === "" ||hotels.country?.toLowerCase().includes(search.toLowerCase())||  hotels.city?.toLowerCase().includes(search.toLowerCase())||hotels.name?.toLowerCase().includes(search.toLowerCase()));  
           const filterprice=  (price===null ||hotels.price <= price  );
-          const filterrating=(rating===null ||hotels.rating >= rating &&(rating+1)>hotels.rating   );
+          const filterrating=(rating===null ||hotels.starRating >= rating &&(rating+1)>hotels.starRating   );
          
           return filterprice &&filterSearch&&filterrating
   }));
@@ -79,7 +81,7 @@ setNewData(data?.filter((hotels: any) =>{
        const   array= newData.slice();
      const   sortHotelsRating  =   array?.sort((a:any,b:any)=>{
 
-     return b.rating-a.rating;
+     return b.starRating-a.starRating;
 
    })
    
