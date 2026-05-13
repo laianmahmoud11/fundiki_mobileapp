@@ -1,16 +1,19 @@
 import { colors } from "@/constants/theme";
-import { useAuthEmail } from "@/hooks/use-auth-email";
+import { useEmailAuth } from "@/hooks/use-auth-email";
 import { Controller, useForm } from "react-hook-form";
 import { Alert, StyleSheet, Text, TextInput, View } from "react-native";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
-import PrimaryButton from "../common/primaryButton";
+import PrimaryButton from "@/components/common/primaryButton";
 
 type FormData = {
   email: string;
   password: string;
 };
 
-const EmailAddress = () => {
+interface EmailAddress {
+  mode: 'login' | 'signup';
+}
+const EmailAddress = ({ mode }: EmailAddress) => {
   const {
     control,
     handleSubmit,
@@ -19,15 +22,10 @@ const EmailAddress = () => {
     mode: "all",
     defaultValues: { email: "", password: "" },
   });
-
-  const { mutate: signInOrUp, isPending } = useAuthEmail();
+  const { mutate, isPending } = useEmailAuth(mode);
 
   const onSubmit = (data: FormData) => {
-    signInOrUp(data, {
-      onError: (error: any) => {
-        Alert.alert("Error", error.message || "Login failed");
-      },
-    });
+   mutate(data, );
   };
 
   return (

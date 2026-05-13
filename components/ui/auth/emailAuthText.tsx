@@ -10,10 +10,7 @@ const EmailAuthIntro = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Enter your email address</Text>
-      <Text style={styles.subtitle}>
-        We'll use this to sign you in or to create an account if you don't have
-        one yet.
-      </Text>
+     
     </View>
   );
 };
@@ -30,8 +27,5 @@ const styles = StyleSheet.create({
     color: colors.black,
     marginBottom: hp("2%"),
   },
-  subtitle: {
-    fontSize: wp("4%"),
-    color: colors.black,
-  },
+ 
 });

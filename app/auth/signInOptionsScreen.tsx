@@ -1,6 +1,6 @@
-import ContinueWith from "@/components/auth/continueWith";
-import Footer from "@/components/auth/footer";
-import SignInText from "@/components/auth/SignInText";
+import ContinueWith from "@/components/ui/auth/continueWith";
+import Footer from "@/components/ui/auth/footer";
+import SignInText from "@/components/ui/auth/SignInText";
 import { colors } from "@/constants/theme";
 import { StyleSheet, View } from "react-native";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";

@@ -1,7 +1,7 @@
 import { Link } from "expo-router";
 import { StyleSheet, View } from "react-native";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
-import PrimaryButton from "../common/primaryButton";
+import PrimaryButton from "@/components/common/primaryButton";
 
 const ContinueWith = () => {
   return (

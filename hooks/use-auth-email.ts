@@ -1,18 +1,14 @@
-import { loginOrSignup } from "@/services/AutheService";
-import { useMutation } from "@tanstack/react-query";
-import { router } from "expo-router";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { login, signup } from '@/services/AutheService';
 
-export const useAuthEmail = () => {
+export const useEmailAuth = (mode: "login" | "signup") => {
+  const queryClient = useQueryClient();
+  const mutationFn = mode === "login" ? login : signup;
+
   return useMutation({
-    mutationFn: async (payload: { email: string; password: string }) => {
-      return await loginOrSignup(payload);
-    },
+    mutationFn,
     onSuccess: (user) => {
-      console.log("success:", user.email);
-      router.replace("/(tabs)");
-    },
-    onError: (error: any) => {
-      console.error("error:", error.code, error.message);
+          void queryClient.invalidateQueries({ queryKey: ['user'] });
     },
   });
 };
