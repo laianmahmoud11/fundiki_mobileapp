@@ -28,7 +28,7 @@ const LoginScreen = () => {
           <Pressable style={styles.signupLinkContainer}>
             <Text style={styles.signupLinkText}>
               Don't have an account?{' '}
-              <Link href={"./auth/signupScreen" }style={styles.signupLink}>
+              <Link href={"/auth/signupScreen" }style={styles.signupLink}>
                 Sign up
               </Link>
             </Text>
@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   signupLink: {
-    color: colors.primary,
+    color: colors.black,
     fontWeight: '600',
   },
 });

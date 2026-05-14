@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   loginLink: {
-    color: colors.primary,
+    color: colors.black,
     fontWeight: '600',
   },
 });

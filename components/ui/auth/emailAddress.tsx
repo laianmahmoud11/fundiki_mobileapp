@@ -4,6 +4,7 @@ import { Controller, useForm } from "react-hook-form";
 import { Alert, StyleSheet, Text, TextInput, View } from "react-native";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import PrimaryButton from "@/components/common/primaryButton";
+import { router } from "expo-router";
 
 type FormData = {
   email: string;
@@ -26,6 +27,7 @@ const EmailAddress = ({ mode }: EmailAddress) => {
 
   const onSubmit = (data: FormData) => {
    mutate(data, );
+   router.push("/(tabs)/(home)/mybookingscreen");
   };
 
   return (
