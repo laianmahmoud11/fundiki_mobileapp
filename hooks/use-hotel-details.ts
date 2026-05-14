@@ -3,10 +3,9 @@ import { getHotelById } from '@/services/firebasehotelSource';
 import { useLocalSearchParams } from 'expo-router';
 
 export const useHotelDetails = () => {
-  const { id } = useLocalSearchParams<{ id: string }>();
-
+  const { id } = useLocalSearchParams();
   return useQuery({
     queryKey: ['hotelDetails', id],
-    queryFn: () => getHotelById(id),
+    queryFn: () => getHotelById(id as string),
   });
 };

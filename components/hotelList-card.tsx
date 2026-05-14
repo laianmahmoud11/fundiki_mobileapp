@@ -1,9 +1,10 @@
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { Rating } from 'react-native-ratings';
 
 
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from "react";
+import { router } from "expo-router";
 const HotelListCard = ({id,name, country,city,street, price,starRating, image,description}: any) => {
 
 
@@ -22,7 +23,12 @@ else{
 
 }
 }
+
+const handleOnPress = () => {
+  router.push(`/hotel-details/${id}`);
+}
     return (
+      <Pressable onPress={handleOnPress}>
         <View style={styles.container} key={id}>
             
                 <Image  style={styles.images} source={ {uri: image}} />
@@ -56,9 +62,9 @@ else{
                  <Text style={styles.price}>${price}</Text>
             </View>
             </View>
-      
-    )
-}
+      </Pressable>
+    );
+};
 
 const styles = StyleSheet.create({
     

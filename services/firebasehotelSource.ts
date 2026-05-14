@@ -26,7 +26,7 @@ export const getHotelById = async (id: string) => {
   const docSnap = await getDoc(docRef);
 
    return {
+      ...(docSnap.data() as Hotel),
       id: docSnap.id,
-      ...docSnap.data(),
-    };
+    } as Hotel;
 }
