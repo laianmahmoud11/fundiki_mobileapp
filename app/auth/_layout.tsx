@@ -5,13 +5,15 @@ import { Ionicons } from "@expo/vector-icons";
 import { router, Stack } from "expo-router";
 import { Pressable, StyleSheet, View } from "react-native";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
+import { AuthProvider } from "@/contexts/AuthContexts";
 
 const AuthLayout = () => {
   const handleOnPress = () => {
-    router.back();
+    router.push("/(tabs)/(home)/mybookingscreen");
   };
 
   return (
+    <AuthProvider>
     <View style={{ flex: 1 }}>
       <SmallNaviBar>
         <BrandLogo />
@@ -28,9 +30,11 @@ const AuthLayout = () => {
         }}
       >
         <Stack.Screen name="signInOptionsScreen" />
-        <Stack.Screen name="emailEntryScreen" />
+        <Stack.Screen name="loginScreen" />
+        <Stack.Screen name="signupScreen" />
       </Stack>
     </View>
+    </AuthProvider>
   );
 };
 

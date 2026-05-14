@@ -1,5 +1,5 @@
 import { getApp, getApps, initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
+import { getAuth, signInAnonymously } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
@@ -15,6 +15,22 @@ const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
 const auth = getAuth(app);
 const db = getFirestore(app);
+
+let authInitPromise: Promise<void>;
+export function ensureAuthInitialized(): Promise<void> {
+  if (!authInitPromise) {
+    authInitPromise = signInAnonymously(auth)
+      .then(() => {
+        console.log('Anonymous auth initialized');
+      })
+      .catch((err) => {
+        console.error('Anonymous auth failed - enable Anonymous sign-in in Firebase Console:', err);
+      });
+  }
+  return authInitPromise;
+}
+
+ensureAuthInitialized();
 
 export { app, auth, db };
 export default app;

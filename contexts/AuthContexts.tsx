@@ -1,23 +1,24 @@
 import { createContext, useContext } from 'react';
-import { useAuthEmail } from '@/hooks/use-auth-email';
+import { useEmailAuth } from '@/hooks/use-auth-email';
+import { UseMutationResult } from '@tanstack/react-query';
+import { AppUser } from '@/types/user';
 
 interface AuthContextType {
-  login: any;
-  signup: any;
-  logout: any;
+  login: UseMutationResult<AppUser, Error, { email: string; password: string; }, unknown>;
+  signup: UseMutationResult<AppUser, Error, { email: string; password: string; }, unknown>;
   isLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType>(null!);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const { login, signup, logout } = useAuthEmail();
+  const loginMutation = useEmailAuth("login");
+  const signupMutation = useEmailAuth("signup");
 
   const value: AuthContextType = {
-    login,
-    signup,
-    logout,
-    isLoading: login.isPending || signup.isPending
+    login: loginMutation,
+    signup: signupMutation,
+    isLoading: loginMutation.isPending || signupMutation.isPending
   };
 
   return (
@@ -27,7 +28,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function useAuthContext() { // 👈 useAuthContext مش useAuth
+export function useAuthContext() { 
   const context = useContext(AuthContext);
 
   if (!context) {
