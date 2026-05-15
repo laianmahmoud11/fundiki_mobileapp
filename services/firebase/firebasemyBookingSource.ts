@@ -13,7 +13,7 @@ import { db } from '../firebaseconfig';
 
 function mapBooking(docSnap: any): Booking {
   const data = docSnap.data();
-
+  
   return {
     id: docSnap.id,
     userId: data.userId ?? '',
@@ -21,11 +21,17 @@ function mapBooking(docSnap: any): Booking {
     hotelName: data.hotelName ?? '',
     city: data.city ?? '',
     image: data.image ?? '',
-    dateFrom: data.dateFrom ?? '',
-    dateTo: data.dateTo ?? '',
+    checkIn: data.checkIn ?? '',
+    checkOut: data.checkOut ?? '',
+    nights: data.nights ?? 0,
     rooms: data.rooms ?? 1,
     guests: data.guests ?? 1,
+    roomType: data.roomType ?? '',
     status: data.status ?? 'pending',
+    paymentStatus: data.paymentStatus ?? '',
+    paymentWay: data.paymentWay ?? '',
+    totalPrice: data.totalPrice ?? '',
+    createdAt: data.createdAt ?? '',
   };
 }
 
@@ -33,49 +39,45 @@ export async function getUserBookingsFromFirebase(userId: string): Promise<Booki
   const bookingsRef = collection(db, 'bookings');
   const bookingsQuery = query(bookingsRef, where('userId', '==', userId));
   const snapshot = await getDocs(bookingsQuery);
-
+  
   return snapshot.docs.map(mapBooking);
 }
 
-export async function createBookingInFirebase(payload: CreateBookingPayload): Promise<Booking> {
+export async function createBookingInFirebase(payload: CreateBookingPayload): Promise<string> {
   const docRef = await addDoc(collection(db, 'bookings'), {
-    ...payload,
-    status: 'pending',
+    userId: payload.userId,
+    hotelId: payload.hotelId,
+    hotelName: payload.hotelName,
+    city: payload.city,
+    image: payload.image,
+    checkIn: payload.checkIn,
+    checkOut: payload.checkOut,
+    nights: payload.nights,
+    rooms: payload.rooms,
+    guests: payload.guests,
+    roomType: payload.roomType,
+    status: payload.status ?? 'pending',
+    paymentStatus: payload.paymentStatus,
+    paymentWay: payload.paymentWay,
+    totalPrice: payload.totalPrice,
+    createdAt: new Date().toISOString(),
   });
-
-  const createdSnapshot = await getDoc(doc(db, 'bookings', docRef.id));
-
-  return mapBooking(createdSnapshot);
+  
+  return docRef.id;
 }
 
-export async function cancelBookingInFirebase(bookingId: string): Promise<Booking | null> {
+export async function updateBookingInFirebase(bookingId: string, updates: Partial<Booking>): Promise<void> {
   const bookingRef = doc(db, 'bookings', bookingId);
-
-  await updateDoc(bookingRef, {
-    status: 'cancelled',
-  });
-
-  const updatedSnapshot = await getDoc(bookingRef);
-
-  if (!updatedSnapshot.exists()) {
-    return null;
-  }
-
-  return mapBooking(updatedSnapshot);
+  await updateDoc(bookingRef, updates);
 }
 
-export async function completeBookingInFirebase(bookingId: string): Promise<Booking | null> {
+export async function getBookingByIdFromFirebase(bookingId: string): Promise<Booking | null> {
   const bookingRef = doc(db, 'bookings', bookingId);
-
-  await updateDoc(bookingRef, {
-    status: 'completed',
-  });
-
-  const updatedSnapshot = await getDoc(bookingRef);
-
-  if (!updatedSnapshot.exists()) {
+  const bookingSnap = await getDoc(bookingRef);
+  
+  if (!bookingSnap.exists()) {
     return null;
   }
-
-  return mapBooking(updatedSnapshot);
+  
+  return mapBooking(bookingSnap);
 }

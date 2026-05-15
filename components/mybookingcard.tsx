@@ -24,16 +24,17 @@ export default function BookingCard({
           {booking.hotelName}
         </Text>
 
-        <Text style={styles.city} numberOfLines={1}>
-          {booking.city}, {booking.country}
-        </Text>
+        {booking.city && (
+          <Text style={styles.city} numberOfLines={1}>
+            {booking.city}
+          </Text>
+        )}
 
         <Text style={styles.details}>
-          🗓 {booking.checkInDate} - {booking.checkOutDate}
+          🗓 {booking.checkIn} - {booking.checkOut}
         </Text>
         <Text style={styles.details}>🛏 {booking.rooms} Rooms</Text>
         <Text style={styles.details}>👤 {booking.guests} Guests</Text>
-        <Text style={styles.details}>⏰ Check-in: {booking.checkInTime}</Text>
 
         <Text style={[styles.status, { color: getBookingStatusColor(booking.status) }]}>
           {getBookingStatusLabel(booking.status)}
