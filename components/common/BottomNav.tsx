@@ -1,5 +1,5 @@
 import { Feather, Ionicons, SimpleLineIcons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { usePathname, useRouter } from 'expo-router';
 import { Text, TouchableOpacity, View } from 'react-native';
 
 function BottomBarIcon({
@@ -34,15 +34,43 @@ type BottomNavProps = {
 
 export default function BottomNav({
   navItems,
-  activeItem = 'Search',
+  activeItem,
 }: BottomNavProps) {
   const router = useRouter();
+  const pathname = usePathname();
 
-  function handleNavigation(item: string) {
-    if (item === 'Home') {
-      router.push('/HomeScreen');
+  const routeByItem: Record<string, string> = {
+    Home: '/HomeScreen',
+    Favorite: '/FavoriteScreen',
+    MyBooking: '/',
+  };
+
+  const routeSegmentByItem: Record<string, string> = {
+    Home: 'HomeScreen',
+    Favorite: 'FavoriteScreen',
+    MyBooking: '',
+  };
+
+  function isActive(item: string) {
+    if (activeItem) {
+      return item === activeItem;
     }
 
+    const routeSegment = routeSegmentByItem[item];
+
+    if (item === 'MyBooking') {
+      return pathname === '/';
+    }
+
+    return routeSegment ? pathname.includes(routeSegment) : false;
+  }
+
+  function handleNavigation(item: string) {
+    const route = routeByItem[item];
+
+    if (route) {
+      router.push(route as never);
+    }
     if (item === 'MyBooking') {
       router.push('/');
     }
@@ -72,7 +100,7 @@ export default function BottomNav({
           activeOpacity={0.85}
           onPress={() => handleNavigation(item)}
         >
-          <BottomBarIcon item={item} active={item === activeItem} />
+          <BottomBarIcon item={item} active={isActive(item)} />
           <Text
             style={{
               color: '#101010',
