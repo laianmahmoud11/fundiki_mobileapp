@@ -1,205 +1,220 @@
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
-import { useEffect, useState } from 'react';
-
+import { View, Text, TouchableOpacity, ScrollView, Image, ActivityIndicator } from 'react-native';
+import { useState, useEffect, useMemo } from 'react';
+import { router } from 'expo-router';
+import { onAuthStateChanged } from 'firebase/auth';
 import SmallNaviBar from '@/components/common/smallNaviBar';
 import Tabs from '@/components/Tabs';
-import EmptyState from '@/components/EmptyState';
-
-import { Booking } from '@/types/booking';
-
+import { auth } from '@/services/firebaseconfig';
+import { useData } from '@/contexts/DataContext';
+import { Ionicons } from '@expo/vector-icons';
 export default function MyBookings() {
-
   const [activeTab, setActiveTab] = useState<'active' | 'past'>('active');
-  const [data, setData] = useState<Booking[]>([]);
-
-  const user = {
-    id: "123",
-    isLoggedIn: true
-  };
-
-  async function getUserBookingsFromFirebase(userId: string): Promise<Booking[]> {
-
-    const hotels = [
-      {
-        id: "h1",
-        name: "Royal Hotel",
-        city: "Paris",
-        image: "https://images.unsplash.com/photo-1501117716987-c8e2a3c7f9d4",
-        bookings: [
-          {
-            userId: "123",
-            status: "completed",
-            dateFrom: "12 Aug",
-            dateTo: "18 Aug",
-            rooms: 2,
-            guests: 3
-          }
-        ]
-      },
-      {
-        id: "h2",
-        name: "Grand Palace",
-        city: "Rome",
-        image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4",
-        bookings: [
-          {
-            userId: "123",
-            status: "active",
-            dateFrom: "5 Sep",
-            dateTo: "10 Sep",
-            rooms: 1,
-            guests: 2
-          }
-        ]
-      }
-    ];
-
-    const result: Booking[] = [];
-
-    hotels.forEach(hotel => {
-      hotel.bookings.forEach((b, index) => {
-        if (b.userId === userId) {
-          result.push({
-            id: hotel.id + "_" + index,
-            userId: b.userId,
-            hotelId: hotel.id,
-            hotelName: hotel.name,
-            city: hotel.city,
-            image: hotel.image,
-            dateFrom: b.dateFrom,
-            dateTo: b.dateTo,
-            rooms: b.rooms,
-            guests: b.guests,
-            status: b.status as any
-          });
-        }
-      });
-    });
-
-    return result;
-  }
+  const [user, setUser] = useState(auth.currentUser);
+  const [authChecked, setAuthChecked] = useState(!!auth.currentUser);
+  
+  const { activeBookings, pastBookings, isLoading } = useData();
 
   useEffect(() => {
-    if (user.isLoggedIn) {
-      getUserBookingsFromFirebase(user.id).then(setData);
-    } else {
-      setData([]);
-    }
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setAuthChecked(true);
+    });
+
+    return () => unsubscribe();
   }, []);
 
-  const active = data.filter(item => item.status === 'active');
+  function handleSignIn() {
+    router.push('/auth/signInOptionsScreen');
+  }
 
-  const past = data.filter(
-    item => item.status === 'completed' || item.status === 'cancelled'
-  );
+  function handleBookNow() {
+    router.push('/(tabs)/(home)/hotelList');
+  }
 
-  const renderCard = (item: Booking) => (
-    <View key={item.id} style={styles.card}>
-      <Image source={{ uri: item.image }} style={styles.image} />
-
-      <View style={styles.info}>
-        <Text style={styles.title}>{item.hotelName}</Text>
-        <Text style={styles.city}>{item.city}</Text>
-
-        <Text>{item.dateFrom} - {item.dateTo}</Text>
-        <Text>{item.rooms} Rooms • {item.guests} Guests</Text>
-
-        <Text style={styles.status}>{item.status}</Text>
+  const renderCard = (item: any) => (
+    <View
+      key={item.id}
+      style={{
+        backgroundColor: '#ffffff',
+        borderRadius: 15,
+        marginBottom: 15,
+        overflow: 'hidden',
+        shadowColor: '#000',
+        shadowOpacity: 0.05,
+        shadowRadius: 8,
+        elevation: 2,
+      }}
+    >
+      <Image source={{ uri: item.image }} style={{ width: '100%', height: 150 }} />
+      <View style={{ padding: 15 }}>
+        <Text style={{ fontSize: 18, fontWeight: '700', color: '#1f2937' }}>
+          {item.hotelName}
+        </Text>
+        {item.city && (
+          <Text style={{ color: '#6b7280', marginTop: 4, fontSize: 14 }}>
+            {item.city}
+          </Text>
+        )}
+        <View style={{ marginTop: 12, flexDirection: 'row', justifyContent: 'space-between' }}>
+          <View>
+            <Text style={{ fontSize: 11, color: '#6b7280', fontWeight: '600' }}>
+              CHECK-IN
+            </Text>
+            <Text style={{ fontSize: 13, color: '#1f2937', fontWeight: '600' }}>
+              {item.checkIn}
+            </Text>
+          </View>
+          <View>
+            <Text style={{ fontSize: 11, color: '#6b7280', fontWeight: '600' }}>
+              CHECK-OUT
+            </Text>
+            <Text style={{ fontSize: 13, color: '#1f2937', fontWeight: '600' }}>
+              {item.checkOut}
+            </Text>
+          </View>
+        </View>
+        {item.nights > 0 && (
+          <Text style={{ marginTop: 8, fontSize: 13, color: '#374151' }}>
+            {item.nights} Night{item.nights > 1 ? 's' : ''}
+          </Text>
+        )}
+        <Text style={{ marginTop: 6, fontSize: 14, color: '#374151' }}>
+          {item.guests} Guest{item.guests > 1 ? 's' : ''} {item.rooms > 0 ? `• ${item.rooms} Room${item.rooms > 1 ? 's' : ''}` : ''}
+        </Text>
+        {item.roomType && (
+          <Text style={{ marginTop: 4, fontSize: 13, color: '#6b7280' }}>
+            {item.roomType}
+          </Text>
+        )}
+        {item.totalPrice && (
+          <Text style={{ marginTop: 8, fontSize: 16, fontWeight: '700', color: '#1f2937' }}>
+            {item.totalPrice}
+          </Text>
+        )}
+        <View
+          style={{
+            marginTop: 12,
+            paddingHorizontal: 12,
+            paddingVertical: 6,
+            borderRadius: 12,
+            alignSelf: 'flex-start',
+            backgroundColor:
+              item.status === 'confirmed' ? '#DCFCE7' :
+              item.status === 'pending' ? '#FEF3C7' :
+              item.status === 'active' ? '#DBEAFE' :
+              item.status === 'completed' ? '#E0E7FF' : '#FEE2E2',
+          }}
+        >
+          <Text
+            style={{
+              fontSize: 11,
+              fontWeight: '700',
+              color:
+                item.status === 'confirmed' ? '#166534' :
+                item.status === 'pending' ? '#92400E' :
+                item.status === 'active' ? '#1E40AF' :
+                item.status === 'completed' ? '#3730A3' : '#991B1B',
+            }}
+          >
+            {item.status.toUpperCase()}
+          </Text>
+        </View>
       </View>
     </View>
   );
 
-  return (
-    <View style={styles.container}>
+  const shouldShowLoading = useMemo(() => {
+    return !authChecked || (user && isLoading);
+  }, [authChecked, user, isLoading]);
 
+  if (shouldShowLoading) {
+    return (
+      <View style={{ flex: 1, backgroundColor: '#f9fafb' }}>
+        <SmallNaviBar>
+          <></>
+        </SmallNaviBar>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size="large" color="#1f4ba5" />
+        </View>
+      </View>
+    );
+  }
+
+  return (
+    <View style={{ flex: 1, backgroundColor: '#f9fafb' }}>
       <SmallNaviBar>
         <></>
       </SmallNaviBar>
 
-      {!user.isLoggedIn ? (
-
-        <View style={styles.center}>
-          <Text style={styles.title}>No bookings yet</Text>
-          <Text style={styles.sub}>Sign in to see your bookings</Text>
-
-          <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>Sign in</Text>
+      {!user ? (
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 30 }}>
+          <Text style={{ fontSize: 22, fontWeight: '700', color: '#1f2937', marginBottom: 8 }}>
+            No bookings yet
+          </Text>
+          <Text style={{ color: '#6b7280', fontSize: 15, textAlign: 'center', marginBottom: 24 }}>
+            Sign in to see your bookings
+          </Text>
+          <TouchableOpacity
+            onPress={handleSignIn}
+            style={{
+              backgroundColor: '#1f4ba5',
+              paddingHorizontal: 32,
+              paddingVertical: 14,
+              borderRadius: 10,
+            }}
+          >
+            <Text style={{ color: '#ffffff', fontSize: 16, fontWeight: '600' }}>Sign in</Text>
           </TouchableOpacity>
         </View>
-
       ) : (
-
         <>
           <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
-
-          <ScrollView style={{ padding: 15 }}>
-
+          <ScrollView style={{ padding: 18 }} showsVerticalScrollIndicator={false}>
             {activeTab === 'active' ? (
-
-              active.length ? active.map(renderCard) : <EmptyState />
-
+              activeBookings.length ? (
+                activeBookings.map(renderCard)
+              ) : (
+                <View style={{ alignItems: 'center', paddingVertical: 60 }}>
+                  <View style={{ width: 80, height: 80, borderRadius: 40, backgroundColor: '#E0E7FF', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
+                   <Ionicons name="calendar-outline" size={36} color="#1f4ba5" />
+                  </View>
+                  <Text style={{ fontSize: 18, fontWeight: '700', color: '#1f2937', marginBottom: 6 }}>
+                    No active bookings
+                  </Text>
+                  <Text style={{ fontSize: 14, color: '#6b7280', textAlign: 'center', marginBottom: 20, paddingHorizontal: 30 }}>
+                    You don't have any upcoming stays!
+                  </Text>
+                  <TouchableOpacity
+                    onPress={handleBookNow}
+                    style={{
+                      backgroundColor: '#1f4ba5',
+                      paddingHorizontal: 32,
+                      paddingVertical: 12,
+                      borderRadius: 10,
+                    }}
+                  >
+                    <Text style={{ color: '#ffffff', fontSize: 15, fontWeight: '600' }}>Book Now</Text>
+                  </TouchableOpacity>
+                </View>
+              )
+            ) : pastBookings.length ? (
+              pastBookings.map(renderCard)
             ) : (
-
-              past.length ? past.map(renderCard) : <EmptyState />
-
+              <View style={{ alignItems: 'center', paddingVertical: 60 }}>
+                <View style={{ width: 80, height: 80, borderRadius: 40, backgroundColor: '#E0E7FF', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
+                  <Ionicons name="calendar-outline" size={36} color="#1f4ba5" />
+                </View>
+                <Text style={{ fontSize: 18, fontWeight: '700', color: '#1f2937', marginBottom: 6 }}>
+                  No past bookings
+                </Text>
+                <Text style={{ fontSize: 14, color: '#6b7280', textAlign: 'center', paddingHorizontal: 30 }}>
+                  Your history will appear here.
+                </Text>
+              </View>
             )}
-
           </ScrollView>
-
         </>
-
       )}
-
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f2f2f2'
-  },
-  center: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: 'bold'
-  },
-  sub: {
-    color: 'gray',
-    marginTop: 5
-  },
-  button: {
-    marginTop: 15,
-    backgroundColor: '#1f4ba5',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 8
-  },
-  buttonText: {
-    color: 'white'
-  },
-  card: {
-    backgroundColor: 'white',
-    borderRadius: 15,
-    marginBottom: 15,
-    overflow: 'hidden'
-  },
-  image: {
-    width: '100%',
-    height: 150
-  },
-  info: {
-    padding: 10
-  },
-  city: {
-    color: 'gray'
-  },
-  status: {
-    marginTop: 5,
-    color: '#1f4ba5'
-  }
-});

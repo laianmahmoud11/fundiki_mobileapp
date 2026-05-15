@@ -9,19 +9,37 @@ export default function Tabs({ activeTab, setActiveTab }: Props) {
   return (
     <View style={styles.container}>
       <TouchableOpacity
-        style={activeTab === 'active' ? styles.activeTab : styles.tab}
+        style={[
+          styles.tab,
+          activeTab === 'active' && styles.activeTab,
+        ]}
         onPress={() => setActiveTab('active')}
+        activeOpacity={0.85}
       >
-        <Text style={activeTab === 'active' ? styles.activeText : styles.text}>
+        <Text
+          style={[
+            styles.text,
+            activeTab === 'active' && styles.activeText,
+          ]}
+        >
           Active
         </Text>
       </TouchableOpacity>
 
       <TouchableOpacity
-        style={activeTab === 'past' ? styles.activeTab : styles.tab}
+        style={[
+          styles.tab,
+          activeTab === 'past' && styles.activeTab,
+        ]}
         onPress={() => setActiveTab('past')}
+        activeOpacity={0.85}
       >
-        <Text style={activeTab === 'past' ? styles.activeText : styles.text}>
+        <Text
+          style={[
+            styles.text,
+            activeTab === 'past' && styles.activeText,
+          ]}
+        >
           Past
         </Text>
       </TouchableOpacity>
@@ -32,30 +50,34 @@ export default function Tabs({ activeTab, setActiveTab }: Props) {
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    paddingHorizontal: 15,
-    paddingTop: 15,
+    paddingHorizontal: 18,
+    paddingTop: 16,
     paddingBottom: 10,
-    flexWrap: 'wrap'
+    gap: 12,
   },
+
   tab: {
-    marginRight: 12,
-    marginBottom: 8
+    backgroundColor: '#E5E7EB',
+    borderRadius: 25,
+    paddingHorizontal: 28,
+    paddingVertical: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
+
   activeTab: {
-    borderWidth: 1,
-    borderColor: '#1f4ba5',
-    borderRadius: 20,
-    paddingHorizontal: 15,
-    paddingVertical: 7,
-    marginRight: 12,
-    marginBottom: 8
+    backgroundColor: '#1f4ba5',
   },
-  activeText: {
-    color: '#1f4ba5',
-    fontSize: 14
-  },
+
   text: {
-    color: 'black',
-    fontSize: 14
-  }
+    color: '#374151',
+    fontSize: 15,
+    fontWeight: '600',
+  },
+
+  activeText: {
+    color: '#FFFFFF',
+    fontSize: 15,
+    fontWeight: '600',
+  },
 });

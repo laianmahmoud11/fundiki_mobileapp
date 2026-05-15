@@ -43,13 +43,13 @@ export default function BottomNav({
       router.push('/HomeScreen');
     }
 
-   
-
-   
-     if (item === 'MyBooking') {
+    if (item === 'MyBooking') {
       router.push('/');
     }
-    
+
+    if (item === 'Profile') {
+      router.push('/profile');
+    }
   }
 
   return (
