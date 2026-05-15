@@ -1,6 +1,7 @@
 import SectionTitle from '@/components/ui/SectionTitle';
 import { AntDesign } from '@expo/vector-icons';
-import { Image, ScrollView, Text, View } from 'react-native';
+import { router } from 'expo-router';
+import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 
 type HomeHotel = {
   id: string;
@@ -25,6 +26,10 @@ export default function HomeSections({
   weekendDeals,
   popularHotels,
 }: HomeSectionsProps) {
+  function openHotelDetails(id: string) {
+    router.push(`/hotel-details/${id}`);
+  }
+
   const capitalIdeas = [...weekendDeals, ...popularHotels]
     .filter((hotel, index, hotels) => {
       return hotels.findIndex((item) => item.city === hotel.city) === index;
@@ -43,8 +48,10 @@ export default function HomeSections({
         contentContainerStyle={{ paddingHorizontal: 16 }}
       >
         {weekendDeals.map((hotel) => (
-          <View
+          <TouchableOpacity
             key={hotel.id}
+            onPress={() => openHotelDetails(hotel.id)}
+            activeOpacity={0.85}
             style={{
               backgroundColor: '#FFFFFF',
               borderRadius: 14,
@@ -193,7 +200,7 @@ export default function HomeSections({
                 </Text>
               </View>
             </View>
-          </View>
+          </TouchableOpacity>
         ))}
       </ScrollView>
 
@@ -207,8 +214,10 @@ export default function HomeSections({
         contentContainerStyle={{ paddingHorizontal: 16 }}
       >
         {popularHotels.map((hotel) => (
-          <View
+          <TouchableOpacity
             key={hotel.id}
+            onPress={() => openHotelDetails(hotel.id)}
+            activeOpacity={0.85}
             style={{
               backgroundColor: '#FFFFFF',
               borderRadius: 16,
@@ -303,7 +312,7 @@ export default function HomeSections({
                 </Text>
               </View>
             </View>
-          </View>
+          </TouchableOpacity>
         ))}
       </ScrollView>
 
@@ -317,8 +326,10 @@ export default function HomeSections({
         contentContainerStyle={{ paddingHorizontal: 16 }}
       >
         {capitalIdeas.map((hotel) => (
-          <View
+          <TouchableOpacity
             key={hotel.id}
+            onPress={() => openHotelDetails(hotel.id)}
+            activeOpacity={0.85}
             style={{ borderRadius: 12, marginRight: 12, overflow: 'hidden', width: 182 }}
           >
             <Image source={{ uri: hotel.image }} style={{ height: 190, width: '100%' }} />
@@ -344,7 +355,7 @@ export default function HomeSections({
             >
               {hotel.city}
             </Text>
-          </View>
+          </TouchableOpacity>
         ))}
       </ScrollView>
     </>
