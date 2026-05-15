@@ -737,7 +737,7 @@ export default function LoggedInProfile({ profile, setProfile, uploadImage, uplo
           onPress={() => setFormType('hotel')}
         />
         <MenuItem
-          icon={<Feather name="heart" size={24} color="#1f2937" />}
+          icon={<Ionicons name="heart-outline" size={25} color="#1f2937" />}
           title={`Saved hotels (${savedHotels.length})`}
           onPress={() => setViewMode('saved-hotels')}
         />
