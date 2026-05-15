@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 
 export const useHotels = () => {
     return useQuery({
-        queryKey: ["products"],
+        queryKey: ["hotels"],
         queryFn: gethotels,
     })
 }

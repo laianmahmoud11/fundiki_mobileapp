@@ -1,25 +1,56 @@
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Alert,Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { Rating } from 'react-native-ratings';
 
 
 import { Ionicons } from '@expo/vector-icons';
-import { useState } from "react";
-const HotelListCard = ({id,name, country,city,street, price,starRating, image,description}: any) => {
+import { useCallback, useState } from "react";
+import { router, useFocusEffect } from "expo-router";
+import {addFavoriteHotel,getFavoriteHotels,isUserLoggedIn,removeFavoriteHotel,} from "@/services/favoriteService";
+
+const HotelListCard = ({id,name, country,city,street, price,starRating, image,description,isFavorite,onFavoriteChange}: any) => {
 
 
-const[favorite,SetFavorite]= useState<"heart-outline"|"heart">("heart-outline");
-const[color,SetColor]= useState("");
+const[favorite,SetFavorite]= useState<"heart-outline"|"heart">(isFavorite ? "heart" : "heart-outline");
+const color = favorite === "heart" ? "red" : "#424141";
 
-const FavoriteHotels =()=>{
-     SetColor("#424141");
+useFocusEffect(
+  useCallback(() => {
+    checkFavorite();
+  }, [id])
+);
+
+const checkFavorite = async () => {
+  if (!isUserLoggedIn()) {
+    SetFavorite("heart-outline");
+    return;
+  }
+
+  const favoriteIds = await getFavoriteHotels();
+
+  if (favoriteIds.includes(id)) {
+    SetFavorite("heart");
+  } else {
+    SetFavorite("heart-outline");
+  }
+};
+
+const FavoriteHotels = async ()=>{
+if(!isUserLoggedIn()){
+  Alert.alert("Sign in required", "Please sign in first to add this hotel to favorite.");
+  return;
+}
+
 if(favorite==="heart-outline"){
   SetFavorite("heart");
-  SetColor("red");
+  await addFavoriteHotel(id);
 }
 else{
     SetFavorite("heart-outline");
-      SetColor("#424141");
+      await removeFavoriteHotel(id);
 
+}
+if(onFavoriteChange){
+  onFavoriteChange();
 }
 }
     return (

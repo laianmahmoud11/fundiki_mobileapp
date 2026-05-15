@@ -46,10 +46,18 @@ export const signup = async (payload: { email: string; password: string }): Prom
   return mapFirebaseUserToAppUser(user);
 };
 
+export const getCurrentUser = async (): Promise<AppUser | null> => {
+  const user = auth.currentUser;
+  
+  if (!user) {
+    return null;
+  }
+  
+  return mapFirebaseUserToAppUser(user);
+};
+
 export const logout = async (): Promise<void> => {
   await auth.signOut();
-  
-  await StorageService.clearAsyncStorage
-  
-  router.replace('./(auth)/signInOptionsScreen');
+  await StorageService.clearAsyncStorage();
+  router.replace('/auth/signInOptionsScreen');
 };
