@@ -3,7 +3,7 @@ import * as React from 'react';
 import { View } from 'react-native';
 import { Button, Divider, Menu } from 'react-native-paper';
 
-const FilterBar = ({FilterPrice,FilterRating,sortNameAToZ,sortNameZToA,sortRating}:any) => {
+const FilterBar = ({FilterPrice,FilterRating,settypeSort}:any) => {
   const [visibleSort, setVisibleSort] = React.useState(false);
   const [visibleFilter, setVisibleFilter] = React.useState(false);
 
@@ -34,11 +34,11 @@ const FilterBar = ({FilterPrice,FilterRating,sortNameAToZ,sortNameZToA,sortRatin
             
           <Button style={{ backgroundColor:"#ffff", margin:5}}  icon="sort" onPress={openSort}>Sort</Button>
           }>
-          <Menu.Item onPress={() => {sortNameAToZ()}} title="sort A----Z" />
-       <Menu.Item onPress={() => {sortNameZToA()}} title="sort Z----A" />
+          <Menu.Item onPress={() => {settypeSort("A-Z")}} title="sort A----Z" />
+       <Menu.Item onPress={() => {settypeSort("Z-A")}} title="sort Z----A" />
           <Divider />
            
-           <Menu.Item onPress={() => {sortRating()}} title="sort according rating" />
+           <Menu.Item onPress={() => {settypeSort("rating")}} title="sort according rating" />
 
         </Menu>
 

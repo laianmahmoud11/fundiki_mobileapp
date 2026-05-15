@@ -1,5 +1,7 @@
+import { HotelProvider } from '@/contexts/HotelContext';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { queryClient } from "@/lib/queryClient";
+
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
@@ -13,6 +15,13 @@ import {
   Poppins_700Bold,
   useFonts,
 } from "@expo-google-fonts/poppins";
+import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { QueryClientProvider } from "@tanstack/react-query";
+import { Stack } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
+import { StatusBar } from 'expo-status-bar';
+import { useEffect } from "react";
+import { PaperProvider, Portal } from 'react-native-paper';
 import 'react-native-reanimated';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '@/services/firebaseconfig';
@@ -80,3 +89,4 @@ export default function RootLayout() {
     </PaperProvider>
   );
 }
+ 

@@ -53,12 +53,7 @@ if(onFavoriteChange){
   onFavoriteChange();
 }
 }
-
-const handleOnPress = () => {
-  router.push(`/hotel-details/${id}`);
-}
     return (
-      <Pressable onPress={handleOnPress}>
         <View style={styles.container} key={id}>
             
                 <Image  style={styles.images} source={ {uri: image}} />
@@ -92,9 +87,9 @@ const handleOnPress = () => {
                  <Text style={styles.price}>${price}</Text>
             </View>
             </View>
-      </Pressable>
-    );
-};
+      
+    )
+}
 
 const styles = StyleSheet.create({
     
