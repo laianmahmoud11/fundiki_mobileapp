@@ -1,31 +1,39 @@
-export type BookingStatus = 'active' | 'pending' | 'confirmed' | 'completed' | 'cancelled';
+export type BookingStatus = 'pending' | 'confirmed' | 'active' | 'completed' | 'cancelled';
 
-export type Booking = {
+export interface Booking {
   id: string;
   userId: string;
-  hotelId: string;
+  hotelId?: string;
   hotelName: string;
-  city: string;
-  country?: string;
+  city?: string;
   image: string;
-  dateFrom: string;
-  dateTo: string;
-  checkInDate?: string;
-  checkOutDate?: string;
-  checkInTime?: string;
-  rooms: number;
+  checkIn: string;
+  checkOut: string;
+  nights?: number;
+  rooms?: number;
   guests: number;
+  roomType?: string;
   status: BookingStatus;
-};
+  paymentStatus?: string;
+  paymentWay?: string;
+  totalPrice?: string;
+  createdAt?: string;
+}
 
-export type CreateBookingPayload = {
+export interface CreateBookingPayload {
   userId: string;
-  hotelId: string;
+  hotelId?: string;
   hotelName: string;
-  city: string;
+  city?: string;
   image: string;
-  dateFrom: string;
-  dateTo: string;
-  rooms: number;
+  checkIn: string;
+  checkOut: string;
+  nights?: number;
+  rooms?: number;
   guests: number;
-};
+  roomType?: string;
+  status?: BookingStatus;
+  paymentStatus?: string;
+  paymentWay?: string;
+  totalPrice?: string;
+}

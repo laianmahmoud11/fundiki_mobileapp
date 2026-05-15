@@ -1,4 +1,5 @@
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 type Props = {
   title?: string;
@@ -17,13 +18,16 @@ const EmptyState = ({
 }: Props) => {
   return (
     <View style={styles.container}>
-      <Image
-        source={{ uri: 'https://cdn-icons-png.flaticon.com/512/854/854878.png' }}
-        style={styles.image}
-        resizeMode="contain"
-      />
+      <View style={styles.iconContainer}>
+        <Ionicons
+          name="calendar-outline"
+          size={50}
+          color="#1f4ba5"
+        />
+      </View>
 
       <Text style={styles.title}>{title}</Text>
+
       <Text style={styles.subtitle}>{subtitle}</Text>
 
       {!hideButton && (
@@ -31,8 +35,6 @@ const EmptyState = ({
           <Text style={styles.buttonText}>{buttonText}</Text>
         </TouchableOpacity>
       )}
-
-    
     </View>
   );
 }
@@ -44,17 +46,24 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 24
   },
-  image: {
-    width: 140,
-    height: 140,
+
+  iconContainer: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: '#E0E7FF',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 20
   },
+
   title: {
     fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 10,
     textAlign: 'center'
   },
+
   subtitle: {
     color: 'gray',
     textAlign: 'center',
@@ -62,21 +71,21 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     maxWidth: 300
   },
+
   button: {
     backgroundColor: '#1f4ba5',
     paddingHorizontal: 30,
     paddingVertical: 12,
-    borderRadius: 8,
+    borderRadius: 30,
     marginBottom: 15,
     minWidth: 140,
     alignItems: 'center'
   },
+
   buttonText: {
     color: 'white',
     fontWeight: 'bold'
-  },
-  link: {
-    color: '#1f4ba5'
   }
 });
+
 export default EmptyState;

@@ -6,7 +6,7 @@ import { Stack } from "expo-router";
 import { StatusBar } from 'expo-status-bar';
 import { PaperProvider, Portal } from 'react-native-paper';
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   Poppins_400Regular,
   Poppins_500Medium,
@@ -14,6 +14,9 @@ import {
   useFonts,
 } from "@expo-google-fonts/poppins";
 import 'react-native-reanimated';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from '@/services/firebaseconfig';
+import { DataProvider } from '@/contexts/DataContext';
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -28,15 +31,27 @@ export default function RootLayout() {
     Poppins_700Bold,
   });
 
+  const [authReady, setAuthReady] = useState(false);
+
   useEffect(() => {
-    if (fontsLoaded) {
+    const unsubscribe = onAuthStateChanged(auth, () => {
+      if (!authReady) {
+        setAuthReady(true);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [authReady]);
+
+  useEffect(() => {
+    if (fontsLoaded && authReady) {
       SplashScreen.hideAsync();
     }
-  }, [fontsLoaded]);
+  }, [fontsLoaded, authReady]);
 
   const colorScheme = useColorScheme();
 
-  if (!fontsLoaded) {
+  if (!fontsLoaded || !authReady) {
     return null;
   }
 
@@ -44,20 +59,22 @@ export default function RootLayout() {
     <PaperProvider>
       <Portal.Host>
         <QueryClientProvider client={queryClient}>
-          <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-            <Stack
-              screenOptions={{
-                headerShown: false,
-                headerTitle: "",
-                header: () => null,
-              }}
-            >
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-              <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-            </Stack>
-           
-            <StatusBar style="auto" />
-          </ThemeProvider>
+          <DataProvider>
+            <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+              <Stack
+                screenOptions={{
+                  headerShown: false,
+                  headerTitle: "",
+                  header: () => null,
+                }}
+              >
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+              </Stack>
+             
+              <StatusBar style="auto" />
+            </ThemeProvider>
+          </DataProvider>
         </QueryClientProvider>
       </Portal.Host>
     </PaperProvider>
