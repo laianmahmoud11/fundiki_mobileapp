@@ -317,41 +317,7 @@ export default function LoggedInProfile({ profile, setProfile, uploadImage, uplo
             </View>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            onPress={handleContact}
-            style={{
-              backgroundColor: '#ffffff',
-              borderRadius: 12,
-              padding: 20,
-              borderWidth: 1,
-              borderColor: '#e5e7eb',
-            }}
-          >
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <View
-                style={{
-                  width: 48,
-                  height: 48,
-                  borderRadius: 24,
-                  backgroundColor: '#FEF3C7',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginRight: 16,
-                }}
-              >
-                <Feather name="message-circle" size={22} color="#F59E0B" />
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 16, fontWeight: '700', color: '#1f2937' }}>
-                  Live Chat
-                </Text>
-                <Text style={{ fontSize: 14, color: '#6b7280', marginTop: 2 }}>
-                  Available 24/7
-                </Text>
-              </View>
-              <Feather name="chevron-right" size={20} color="#9ca3af" />
-            </View>
-          </TouchableOpacity>
+          
         </ScrollView>
       </View>
     );
