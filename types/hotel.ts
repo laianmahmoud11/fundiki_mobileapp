@@ -1,10 +1,11 @@
+import { Room } from "./room";
 export type Hotel = {
-      id: string;
+  id: string;
   name: string;
   city: string;
   country: string;
   street: string;
-  image: string;
+  image: string[];
   price?: number;
   description: string;
   starRating: number;
@@ -15,5 +16,6 @@ export type Hotel = {
   badge: string | null;
   nights: string;
 isWeekendDeal:boolean;
-hasDiscount : boolean;
+ hasDiscount : boolean;
+  rooms: Room[];
 };
