@@ -1,18 +1,19 @@
+import { HotelProvider } from '@/contexts/HotelContext';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { queryClient } from "@/lib/queryClient";
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { QueryClientProvider } from "@tanstack/react-query";
-import { Stack } from "expo-router";
-import { StatusBar } from 'expo-status-bar';
-import { PaperProvider, Portal } from 'react-native-paper';
-import * as SplashScreen from "expo-splash-screen";
-import { useEffect } from "react";
 import {
   Poppins_400Regular,
   Poppins_500Medium,
   Poppins_700Bold,
   useFonts,
 } from "@expo-google-fonts/poppins";
+import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { QueryClientProvider } from "@tanstack/react-query";
+import { Stack } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
+import { StatusBar } from 'expo-status-bar';
+import { useEffect } from "react";
+import { PaperProvider, Portal } from 'react-native-paper';
 import 'react-native-reanimated';
 
 export const unstable_settings = {
@@ -45,6 +46,7 @@ export default function RootLayout() {
       <Portal.Host>
         <QueryClientProvider client={queryClient}>
           <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+            <HotelProvider>
             <Stack
               screenOptions={{
                 headerShown: false,
@@ -57,9 +59,11 @@ export default function RootLayout() {
             </Stack>
            
             <StatusBar style="auto" />
+            </HotelProvider>
           </ThemeProvider>
         </QueryClientProvider>
       </Portal.Host>
     </PaperProvider>
   );
 }
+ 
