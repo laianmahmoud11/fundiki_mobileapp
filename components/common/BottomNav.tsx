@@ -71,6 +71,13 @@ export default function BottomNav({
     if (route) {
       router.push(route as never);
     }
+    if (item === 'MyBooking') {
+      router.push('/');
+    }
+
+    if (item === 'Profile') {
+      router.push('/profile');
+    }
   }
 
   return (
