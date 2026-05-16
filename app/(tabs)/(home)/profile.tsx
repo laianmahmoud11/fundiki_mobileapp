@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
-import { onAuthStateChanged } from 'firebase/auth';
+import { onAuthStateChanged, User } from 'firebase/auth';
 import { auth } from '@/services/firebaseconfig';
 import { signOutUser } from '@/services/profileService';
 import { useProfile } from '@/hooks/useProfile';
@@ -10,29 +10,33 @@ import LoggedInProfile from '@/components/profile/LoggedInProfile';
 
 export default function ProfileScreen() {
   const { profile, loading, uploading, setProfile, uploadImage, refetch } = useProfile();
-  const [user, setUser] = useState(auth.currentUser);
+  const [user, setUser] = useState<User | null>(auth.currentUser);
   const [authLoading, setAuthLoading] = useState(true);
+
+  const isRealUser = user && !user.isAnonymous;
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
-      
-      if (currentUser) {
+
+      if (currentUser && !currentUser.isAnonymous) {
         await refetch();
+      } else {
+        setProfile(null);
       }
-      
+
       setAuthLoading(false);
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [refetch, setProfile]);
 
   useFocusEffect(
     useCallback(() => {
-      if (user) {
+      if (isRealUser) {
         refetch();
       }
-    }, [user, refetch])
+    }, [isRealUser, refetch])
   );
 
   async function handleSignOut() {
@@ -53,7 +57,7 @@ export default function ProfileScreen() {
     );
   }
 
-  return user && profile ? (
+  return isRealUser && profile ? (
     <LoggedInProfile
       profile={profile}
       setProfile={setProfile}

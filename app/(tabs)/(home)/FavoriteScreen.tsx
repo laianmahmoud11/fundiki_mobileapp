@@ -1,40 +1,61 @@
 import BrandLogo from "@/components/common/brandLogo";
 import SmallNaviBar from "@/components/common/smallNaviBar";
 import HotelListCard from "@/components/hotelList-card";
-import { getFavoriteHotels, isUserLoggedIn } from "@/services/favoriteService";
-import { gethotels } from "@/services/firebasehotelSource";
-import { useEffect, useState } from "react";
+import { useData } from "@/contexts/DataContext";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
-import { heightPercentageToDP as hp, widthPercentageToDP as wp,
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
 } from "react-native-responsive-screen";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useCallback, useEffect, useState } from "react";
+import * as SQLite from "expo-sqlite";
+import NetInfo from "@react-native-community/netinfo";
 
 export default function FavoriteScreen() {
-  const [hotels, setHotels] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [loggedIn, setLoggedIn] = useState(false);
-
+   const [savedHotels, setSavedHotels] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [db, setDb] = useState<SQLite.SQLiteDatabase | null>(null);
+  const [offlineFavorites, setOfflineFavorites] = useState<any[]>([]);
   useEffect(() => {
-    loadFavorites();
+    let cancelled = false;
+    (async () => {
+      const database = await SQLite.openDatabaseAsync("hotels.db");
+      await database.execAsync(
+        `CREATE TABLE IF NOT EXISTS favorites (
+          id TEXT PRIMARY KEY NOT NULL, name TEXT NOT NULL, price REAL, rating REAL
+        );`
+      );
+      if (!cancelled) setDb(database);
+    })();
+    return () => { cancelled = true; };
   }, []);
 
-  async function loadFavorites() {
-    if (!isUserLoggedIn()) {
-      setLoggedIn(false);
-      setLoading(false);
-      return;
-    }
+  const loadOffline = useCallback(async () => {
+    if (!db) return;
+    const rows = await db.getAllAsync<any>("SELECT * FROM favorites ORDER BY id DESC;");
+    setOfflineFavorites(rows.map((r) => r.text));
+  }, [db]);
 
-    setLoggedIn(true);
-    const favoriteIds = await getFavoriteHotels();
-    const allHotels = await gethotels();
-    const data = allHotels.filter((hotel: any) => favoriteIds.includes(hotel.id));
-    setHotels(data);
-    setLoading(false);
-  }
+    const loadFavorites = async (database?: SQLite.SQLiteDatabase) => {
+    const dbInstance = database || db;
+    if (!dbInstance) return;
 
+    setIsLoading(true);
+
+    const rows = await dbInstance.getAllAsync(
+      "SELECT * FROM favorites ORDER BY rowid DESC;"
+    );
+
+    setSavedHotels(rows);
+    setIsLoading(false);
+  };
+const refreshData = async () => {
+    await loadFavorites();
+  };
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
+
       <SmallNaviBar>
         <BrandLogo />
       </SmallNaviBar>
@@ -42,40 +63,37 @@ export default function FavoriteScreen() {
       <View style={styles.content}>
         <Text style={styles.title}>Favorite Hotels</Text>
 
-        {loading && (
+        {isLoading && (
           <View style={styles.messageBox}>
             <Text style={styles.message}>Loading...</Text>
           </View>
         )}
 
-        {!loading && !loggedIn && (
-          <View style={styles.messageBox}>
-            <Text style={styles.message}>
-              Please sign in first to see your favorite hotels.
-            </Text>
-          </View>
-        )}
-
-        {!loading && loggedIn && hotels.length === 0 && (
+        {!isLoading && savedHotels.length === 0 && (
           <View style={styles.messageBox}>
             <Text style={styles.message}>No favorite hotels yet.</Text>
           </View>
         )}
       </View>
 
-      {hotels.length > 0 && (
+محمد جهاد نظمي دويكات
+7:31 PM
+{savedHotels.length > 0 && (
         <ScrollView contentContainerStyle={styles.list}>
-          {hotels.map((hotel: any) => (
+          {savedHotels.map((hotel) => (
             <HotelListCard
               key={hotel.id}
               {...hotel}
+              price={hotel.pricePerNight}
+              starRating={hotel.rating}
               isFavorite
-              onFavoriteChange={loadFavorites}
+              onFavoriteChange={refreshData}
             />
           ))}
         </ScrollView>
       )}
-    </SafeAreaView>
+
+    </View>
   );
 }
 

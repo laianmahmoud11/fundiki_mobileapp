@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { getHotelById } from '@/services/firebasehotelSource';
 import { useLocalSearchParams } from 'expo-router';
-import { ensureAuthInitialized } from '@/services/firebaseconfig';
 import { Hotel } from '@/types/hotel';
 
 export const useHotelDetails = () => {
@@ -13,7 +12,6 @@ export const useHotelDetails = () => {
   return useQuery<Hotel, Error>({
     queryKey: ["hotel", hotelId],
     queryFn: async () => {
-      await ensureAuthInitialized();
       const result = await getHotelById(hotelId!);
       return result;  
     },

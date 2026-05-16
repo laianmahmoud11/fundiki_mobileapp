@@ -17,7 +17,7 @@ import { useHotel } from "@/contexts/HotelContext";
 const HotelDetails = () => {
 
   const { data: hotel, isLoading, error } = useHotelDetails();
-  const { selectedRoom } = useHotel();
+  const { selectedRoom ,setSelectedRoom} = useHotel();
   const queryClient = useQueryClient();
 
 
@@ -41,19 +41,21 @@ const HotelDetails = () => {
 
   const handleBooking = () => {
 
-    queryClient.setQueryData(['booking'], {
+   setSelectedRoom( queryClient.setQueryData(['booking'], {
       hotelId: hotel?.id,
       hotelName: hotel?.name,
       roomId: selectedRoom?.id,
-      roomName: selectedRoom?.name,
+      roomType: selectedRoom?.name,
       roomPrice: selectedRoom?.price,
+      image:hotel?.image,
       dateFrom,
       dateTo,
       nights,
       guests,
       totalPrice: selectedRoom?.price ? selectedRoom.price * nights : 0,
-    });
-    router.push('/');
+    }));
+    
+    router.push('/hotel-details/booking');
   }
   if (isLoading) {
     return (

@@ -133,7 +133,6 @@ const BookingSummary = ({
     </ScrollView>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "white",

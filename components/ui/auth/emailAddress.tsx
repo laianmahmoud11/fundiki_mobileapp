@@ -11,9 +11,9 @@ type FormData = {
   password: string;
 };
 
-interface EmailAddress {
+type EmailAddress = {
   mode: 'login' | 'signup';
-}
+};
 const EmailAddress = ({ mode }: EmailAddress) => {
   const {
     control,

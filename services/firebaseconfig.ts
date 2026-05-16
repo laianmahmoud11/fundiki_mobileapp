@@ -1,5 +1,5 @@
 import { getApp, getApps, initializeApp } from 'firebase/app';
-import { initializeAuth, getAuth, getReactNativePersistence, Auth,signInAnonymously } from 'firebase/auth';
+import { initializeAuth, getAuth, getReactNativePersistence, Auth, signOut } from 'firebase/auth';
 import { getFirestore, Firestore } from 'firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -12,6 +12,7 @@ const firebaseConfig = {
   appId: "1:955412175085:web:c073a6ef8f407b6368d4e4"
 };
 
+
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
 let auth: Auth;
@@ -23,23 +24,13 @@ try {
   auth = getAuth(app);
 }
 
-const db: Firestore = getFirestore(app);
-
-let authInitPromise: Promise<void>;
-export function ensureAuthInitialized(): Promise<void> {
-  if (!authInitPromise) {
-    authInitPromise = signInAnonymously(auth)
-      .then(() => {
-        console.log('Anonymous auth initialized');
-      })
-      .catch((err) => {
-        console.error('Anonymous auth failed - enable Anonymous sign-in in Firebase Console:', err);
-      });
+auth.onAuthStateChanged((user) => {
+  if (user && user.isAnonymous) {
+    signOut(auth).catch(console.error);
   }
-  return authInitPromise;
-}
+});
 
-ensureAuthInitialized();
+const db: Firestore = getFirestore(app);
 
 export { app, auth, db };
 export default app;

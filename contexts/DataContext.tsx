@@ -18,7 +18,7 @@ type DataContextType = {
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
-export function DataProvider({ children }: { children: React.ReactNode }) {
+export function DataProvider({ children }: any) {
   const [savedHotels, setSavedHotels] = useState<SavedHotel[]>([]);
   const [activeBookings, setActiveBookings] = useState<Booking[]>([]);
   const [pastBookings, setPastBookings] = useState<Booking[]>([]);

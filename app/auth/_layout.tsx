@@ -5,7 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { router, Stack } from "expo-router";
 import { Pressable, StyleSheet, View } from "react-native";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
-import { AuthProvider } from "@/contexts/AuthContexts";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 const AuthLayout = () => {
   const handleOnPress = () => {

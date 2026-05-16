@@ -16,7 +16,7 @@ export default function A() {
       checkOut: "2026-05-18",
       totalPrice: 120 * 3 +" "+ "USD",
     });
- router.push("/booking");
+ router.push("/hotel-details/booking");
     
   };
 
