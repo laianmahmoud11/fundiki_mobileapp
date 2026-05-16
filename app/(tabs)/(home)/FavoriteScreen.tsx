@@ -13,8 +13,8 @@ import * as SQLite from "expo-sqlite";
 import NetInfo from "@react-native-community/netinfo";
 
 export default function FavoriteScreen() {
-   const [savedHotels, setSavedHotels] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { savedHotels, isLoading, addSavedHotel, removeSavedHotel, refreshData } = useData();
+  const [isOffline, setIsOffline] = useState(false);
   const [db, setDb] = useState<SQLite.SQLiteDatabase | null>(null);
   const [offlineFavorites, setOfflineFavorites] = useState<any[]>([]);
   useEffect(() => {
@@ -37,25 +37,37 @@ export default function FavoriteScreen() {
     setOfflineFavorites(rows.map((r) => r.text));
   }, [db]);
 
-    const loadFavorites = async (database?: SQLite.SQLiteDatabase) => {
-    const dbInstance = database || db;
-    if (!dbInstance) return;
+    useEffect(() => { void loadOffline(); }, [loadOffline]);
 
-    setIsLoading(true);
+    useEffect(() => {
+      const unsubscribe = NetInfo.addEventListener((state) => {
+        console.log("Is connected?", state.isConnected);
+        setIsOffline(!state.isConnected);
+    });
+    return () => unsubscribe();
+    },[]);
 
-    const rows = await dbInstance.getAllAsync(
-      "SELECT * FROM favorites ORDER BY rowid DESC;"
-    );
+    const handleToggle = async (hotel: any) => {
+    const isAlreadySaved = offlineFavorites.some((h: any) => h.id === hotel.id);
 
-    setSavedHotels(rows);
-    setIsLoading(false);
+    if (isAlreadySaved) {
+      await db?.runAsync("DELETE FROM favorites WHERE id = ?;", [hotel.id]);
+      if (!isOffline) await removeSavedHotel(hotel.id);
+    } else {
+      await db?.runAsync(
+        `INSERT OR REPLACE INTO favorites (id, name, city, price, image, rating) 
+         VALUES (?, ?, ?, ?, ?, ?);`,
+        [hotel.id, hotel.name, hotel.city, hotel.pricePerNight || hotel.price, hotel.image, hotel.rating || hotel.starRating]
+      );
+      if (!isOffline) await addSavedHotel(hotel.id);
+    }
+    await loadOffline(); 
   };
-const refreshData = async () => {
-    await loadFavorites();
-  };
+
+  const displayHotels = isOffline ? offlineFavorites : savedHotels;
+  const loading = isLoading && !isOffline;
   return (
-    <View style={styles.container}>
-
+    <SafeAreaView style={styles.container}>
       <SmallNaviBar>
         <BrandLogo />
       </SmallNaviBar>
@@ -63,35 +75,33 @@ const refreshData = async () => {
       <View style={styles.content}>
         <Text style={styles.title}>Favorite Hotels</Text>
 
-        {isLoading && (
+        {loading ? (
           <View style={styles.messageBox}>
             <Text style={styles.message}>Loading...</Text>
           </View>
-        )}
-
-        {!isLoading && savedHotels.length === 0 && (
+        ):loading ?displayHotels.length === 0 && (
           <View style={styles.messageBox}>
-            <Text style={styles.message}>No favorite hotels yet.</Text>
-          </View>
-        )}
-      </View>
-
-{savedHotels.length > 0 && (
+    <Text style={styles.message}>
+              {isOffline ? "No offline data found" : "No favorite hotels yet"}
+            </Text>
+            </View>
+      ):(
         <ScrollView contentContainerStyle={styles.list}>
-          {savedHotels.map((hotel) => (
+          {displayHotels.map((hotel: any) => (
             <HotelListCard
               key={hotel.id}
               {...hotel}
               price={hotel.pricePerNight}
               starRating={hotel.rating}
-              isFavorite
-              onFavoriteChange={refreshData}
+              isFavorite={true}
+              onFavoriteChange={() => handleToggle(hotel)}
             />
           ))}
         </ScrollView>
       )}
+            </View>
 
-    </View>
+    </SafeAreaView>
   );
 }
 
