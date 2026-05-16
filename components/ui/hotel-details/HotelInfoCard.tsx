@@ -10,6 +10,8 @@ hotel: Hotel;
 };
 
 const HotelInfoCard= ({ hotel }: HotelInfoCardProps) => {
+  const imageUri = Array.isArray(hotel?.image) ? hotel.image[0] : hotel?.image;
+
   return (
     <View style={styles.container}>
         <View style={styles.infoContainer}>
@@ -26,7 +28,7 @@ const HotelInfoCard= ({ hotel }: HotelInfoCardProps) => {
         </View>
         
       </View>
-      <Image source={{ uri: hotel?.image }} style={styles.heroImage} />
+      <Image source={imageUri ? { uri: imageUri } : undefined} style={styles.heroImage} />
     </View>
   );
 };

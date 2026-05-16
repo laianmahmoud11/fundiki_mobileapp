@@ -1,11 +1,19 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import { colors } from '@/constants/theme';
 import PrimaryButton from '@/components/common/primaryButton';
 import { useHotel } from '@/contexts/HotelContext';
-import { Picker } from '@react-native-picker/picker';
+import StorageService from '@/services/StorageService';
+import { router } from 'expo-router';
 import { Calendar } from 'react-native-calendars';
+import { useProfile } from '@/hooks/useProfile';
+import { ProfileUser } from '@/types/profile';
+import DropDownPicker from 'react-native-dropdown-picker';
+
+export const isProfileComplete = (profile: ProfileUser | null) => {
+  return !!(profile?.firstName && profile?.lastName);
+};
 
 type BookingSummaryProps = {
   hotelName: string;
@@ -33,20 +41,28 @@ const BookingSummary = ({
   setDateTo,
 }: BookingSummaryProps) => {
   const { selectedRoom } = useHotel();
+  const { profile } = useProfile();
   const [showCalendar, setShowCalendar] = useState(false);
-  
+  const [guestOpen, setGuestOpen] = useState(false);
+  const [guestItems, setGuestItems] = useState([
+    { label: '1 guest', value: 1 },
+    { label: '2 guests', value: 2 },
+    { label: '3 guests', value: 3 },
+    { label: '4 guests', value: 4 },
+  ]);
+
   const totalPrice = selectedRoom ? selectedRoom.price * nights : 0;
 
   const markedDates = {
-    [dateFrom]: { 
-      startingDay: true, 
-      color: colors.primary, 
-      textColor: 'white' 
+    [dateFrom]: {
+      startingDay: true,
+      color: colors.primary,
+      textColor: 'white',
     },
-    [dateTo]: { 
-      endingDay: true, 
-      color: colors.primary, 
-      textColor: 'white' 
+    [dateTo]: {
+      endingDay: true,
+      color: colors.primary,
+      textColor: 'white',
     },
   };
 
@@ -54,28 +70,32 @@ const BookingSummary = ({
     if (!dateFrom) {
       setDateFrom(day.dateString);
     } else if (!dateTo) {
-      setDateTo(day.dateString); 
+      setDateTo(day.dateString);
       setShowCalendar(false);
     } else {
-      setDateFrom(day.dateString); 
+      setDateFrom(day.dateString);
       setDateTo('');
     }
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      nestedScrollEnabled
+      keyboardShouldPersistTaps="handled"
+    >
       <Text style={styles.title}>Booking Summary</Text>
 
-      <TouchableOpacity 
-        style={styles.dateField} 
+      <TouchableOpacity
+        style={styles.dateField}
         onPress={() => setShowCalendar(true)}
       >
         <Text style={styles.dateLabel}>Check-in</Text>
-        <Text style={styles.dateValue}>{dateFrom }</Text>
+        <Text style={styles.dateValue}>{dateFrom}</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity 
-        style={styles.dateField} 
+      <TouchableOpacity
+        style={styles.dateField}
         onPress={() => setShowCalendar(true)}
       >
         <Text style={styles.dateLabel}>Check-out</Text>
@@ -84,27 +104,51 @@ const BookingSummary = ({
 
       <View style={styles.guestsField}>
         <Text style={styles.guestsLabel}>Guests</Text>
-        <Picker 
-          selectedValue={guests} 
-          onValueChange={setGuests} 
-          style={styles.picker}
-        >
-          {[1,2,3,4].map(n => (
-            <Picker.Item key={n} label={`${n} guest${n>1?'s':''}`} value={n} />
-          ))}
-        </Picker>
+
+        <DropDownPicker
+          open={guestOpen}
+          value={guests}
+          items={guestItems}
+          setOpen={setGuestOpen}
+          setValue={(callback: any) => {
+            const value = callback(guests);
+            setGuests(value);
+          }}
+          setItems={setGuestItems}
+          style={styles.dropdown}
+          dropDownContainerStyle={styles.dropdownContainer}
+          listMode="SCROLLVIEW"
+          zIndex={3000}
+          zIndexInverse={1000}
+        />
       </View>
 
       {selectedRoom && (
         <View style={styles.priceCard}>
-          <Text style={styles.priceText}>${selectedRoom.price} × {nights} nights</Text>
+          <Text style={styles.priceText}>
+            ${selectedRoom.price} × {nights} nights
+          </Text>
           <Text style={styles.totalPrice}>${totalPrice}</Text>
         </View>
       )}
 
       <PrimaryButton
-        title={"Book Now"}
-        onPress={onBookingPress}
+        title="Book Now"
+        onPress={async () => {
+          const user = await StorageService.getUser();
+
+          if (!user) {
+            router.push('/auth/signInOptionsScreen');
+            return;
+          }
+
+          if (!isProfileComplete(profile)) {
+            router.push('/profile');
+            return;
+          }
+
+          onBookingPress();
+        }}
         disabled={isDisabled || !selectedRoom}
         color="blue"
       />
@@ -118,11 +162,12 @@ const BookingSummary = ({
             theme={{
               selectedDayBackgroundColor: colors.primary,
               selectedDayTextColor: 'white',
-              todayTextColor: "red",
+              todayTextColor: 'red',
               arrowColor: colors.black,
             }}
           />
-          <TouchableOpacity 
+
+          <TouchableOpacity
             style={styles.closeBtn}
             onPress={() => setShowCalendar(false)}
           >
@@ -133,9 +178,10 @@ const BookingSummary = ({
     </ScrollView>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "white",
+    backgroundColor: 'white',
     padding: wp(4),
     margin: wp(3),
     borderRadius: 16,
@@ -165,16 +211,22 @@ const styles = StyleSheet.create({
   },
   guestsField: {
     marginVertical: wp(3),
+    zIndex: 3000,
   },
   guestsLabel: {
     fontSize: wp(4),
     fontWeight: '600',
     marginBottom: wp(2),
   },
-  picker: {
+  dropdown: {
     backgroundColor: '#f8f9fa',
+    borderColor: '#e5e7eb',
     borderRadius: 12,
-    height: 50,
+    minHeight: 50,
+  },
+  dropdownContainer: {
+    backgroundColor: 'white',
+    borderColor: '#e5e7eb',
   },
   priceCard: {
     backgroundColor: '#e3f2fd',
@@ -192,7 +244,7 @@ const styles = StyleSheet.create({
   totalPrice: {
     fontSize: wp(5.5),
     fontWeight: 'bold',
-    color: "#0d70d3",
+    color: '#0d70d3',
   },
   calendarWrapper: {
     marginTop: wp(3),

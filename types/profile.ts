@@ -23,7 +23,11 @@ export type SavedHotel = {
   country: string;
   image: string;
   pricePerNight?: number;
+  price?: number;
   rating?: number;
+  starRating?: number;
+  street?: string;
+  description?: string;
   savedAt?: string;
 };
 
