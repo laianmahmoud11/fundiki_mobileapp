@@ -76,8 +76,6 @@ const refreshData = async () => {
         )}
       </View>
 
-محمد جهاد نظمي دويكات
-7:31 PM
 {savedHotels.length > 0 && (
         <ScrollView contentContainerStyle={styles.list}>
           {savedHotels.map((hotel) => (
