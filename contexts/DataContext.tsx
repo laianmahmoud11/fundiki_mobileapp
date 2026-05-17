@@ -18,7 +18,7 @@ type DataContextType = {
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
-export function DataProvider({ children }: { children: React.ReactNode }) {
+export function DataProvider({ children }: any) {
   const [savedHotels, setSavedHotels] = useState<SavedHotel[]>([]);
   const [activeBookings, setActiveBookings] = useState<Booking[]>([]);
   const [pastBookings, setPastBookings] = useState<Booking[]>([]);
@@ -85,7 +85,6 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     try {
       await saveHotel(hotelId);
       await loadData();
-      Alert.alert('Success', 'Hotel saved!');
     } catch (error) {
       console.error('Error saving hotel:', error);
       Alert.alert('Error', 'Failed to save hotel');
@@ -96,7 +95,6 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     try {
       await unsaveHotel(hotelId);
       await loadData();
-      Alert.alert('Success', 'Hotel removed from saved!');
     } catch (error) {
       console.error('Error removing hotel:', error);
       Alert.alert('Error', 'Failed to remove hotel');

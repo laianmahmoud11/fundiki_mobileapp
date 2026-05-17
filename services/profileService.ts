@@ -148,7 +148,8 @@ export async function getSavedHotels(): Promise<SavedHotel[]> {
           city: data.city ?? '',
           country: data.country ?? '',
           image: data.image ?? '',
-          pricePerNight: data.pricePerNight ?? 0,
+          pricePerNight: data.pricePerNight ?? data.price ?? 0,
+          price: data.price ?? data.pricePerNight ?? 0,
           rating: data.rating ?? 0,
           savedAt: snapshot.docs.find(d => d.data().hotelId === hotelId)?.data().savedAt,
         });

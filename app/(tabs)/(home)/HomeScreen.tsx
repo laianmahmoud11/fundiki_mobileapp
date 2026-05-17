@@ -24,8 +24,8 @@ export default function HomeScreen() {
       reviews: '0 reviews',
       badge: hotel?.isWeekendDeal ? 'Weekend deal' : null,
       nights: '2 nights',
-      oldPrice: hotel?.oldPrice ? `EUR ${hotel.oldPrice}` : '',
-      newPrice: price ? `EUR ${price}` : '',
+      oldPrice: hotel?.oldPrice ? `$${hotel.oldPrice}` : '',
+      newPrice: price ? `$${price}` : '',
       image: hotel?.image ?? '',
     };
   });
