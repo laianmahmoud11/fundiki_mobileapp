@@ -1,5 +1,5 @@
 import { getApp, getApps, initializeApp } from 'firebase/app';
-import { initializeAuth, getAuth, getReactNativePersistence, Auth } from 'firebase/auth';
+import { initializeAuth, getAuth, getReactNativePersistence, Auth, signOut } from 'firebase/auth';
 import { getFirestore, Firestore } from 'firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -24,6 +24,13 @@ try {
 }
 
 const db: Firestore = getFirestore(app);
+
+auth.onAuthStateChanged((user) => {
+  if (user && user.isAnonymous) {
+    console.log('Removing anonymous user...');
+    signOut(auth).catch(console.error);
+  }
+});
 
 export { app, auth, db };
 export default app;

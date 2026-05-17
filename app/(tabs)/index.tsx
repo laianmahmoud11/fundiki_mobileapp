@@ -93,12 +93,11 @@ export default function HomeScreen() {
   }
 
   function handleSignIn() {
-    Alert.alert('Sign in', 'Connect this button to your team login screen later.');
-       router.push('/auth/signInOptionsScreen');
+    router.push('/auth/signInOptionsScreen');
   }
 
   function handleAddBooking() {
-    Alert.alert('Add booking', 'Connect this button to your booking flow later.');
+    router.push('/(tabs)/(home)/hotelList');
   }
 
   function renderLoggedOutState() {
@@ -108,14 +107,19 @@ export default function HomeScreen() {
         subtitle="Please sign in first to view and manage your bookings."
         buttonText="Sign in"
         onPressButton={handleSignIn}
-        
       />
     );
   }
 
   function renderContent() {
     if (loading) {
-      return <ActivityIndicator size="large" color="#1f4ba5" style={styles.loader} />;
+      return (
+        <ActivityIndicator
+          size="large"
+          color="#1f4ba5"
+          style={styles.loader}
+        />
+      );
     }
 
     if (!currentUserId) {
@@ -158,10 +162,20 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-       <SmallNaviBar ><BrandLogo /></SmallNaviBar>
-      <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
+      <SmallNaviBar>
+        <BrandLogo />
+      </SmallNaviBar>
+
+      <Tabs
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+      />
+
       {renderContent()}
-       <BottomNav navItems={['Home','Favorite','MyBooking', 'Profile',]} />
+
+      <BottomNav
+        navItems={['Home', 'Favorite', 'MyBooking', 'Profile']}
+      />
     </SafeAreaView>
   );
 }
@@ -169,9 +183,10 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f2f2f2'
+    backgroundColor: '#f2f2f2',
   },
+
   loader: {
-    marginTop: 40
-  }
+    marginTop: 40,
+  },
 });

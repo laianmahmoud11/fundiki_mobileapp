@@ -42,7 +42,7 @@ export default function BottomNav({
   const routeByItem: Record<string, string> = {
     Home: '/HomeScreen',
     Favorite: '/FavoriteScreen',
-    MyBooking: '/',
+    MyBooking: '/mybookingscreen',
   };
 
   const routeSegmentByItem: Record<string, string> = {
@@ -59,7 +59,7 @@ export default function BottomNav({
     const routeSegment = routeSegmentByItem[item];
 
     if (item === 'MyBooking') {
-      return pathname === '/';
+      return pathname === '/mybookingscreen';
     }
 
     return routeSegment ? pathname.includes(routeSegment) : false;
@@ -70,9 +70,6 @@ export default function BottomNav({
 
     if (route) {
       router.push(route as never);
-    }
-    if (item === 'MyBooking') {
-      router.push('/');
     }
 
     if (item === 'Profile') {

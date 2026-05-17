@@ -14,7 +14,7 @@ const StorageService = {
     await SecureStore.deleteItemAsync("token");
   },
 
-  async saveUser(user:any){
+  async saveUser(user: any){
     await AsyncStorage.setItem("user", JSON.stringify(user));
   },
 

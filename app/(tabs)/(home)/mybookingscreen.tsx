@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, ScrollView, Image, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Image, ActivityIndicator, Alert } from 'react-native';
 import { useState, useEffect, useMemo } from 'react';
 import { router } from 'expo-router';
 import { onAuthStateChanged } from 'firebase/auth';
@@ -7,12 +7,13 @@ import Tabs from '@/components/Tabs';
 import { auth } from '@/services/firebaseconfig';
 import { useData } from '@/contexts/DataContext';
 import { Ionicons } from '@expo/vector-icons';
+import { cancelBooking, completeBooking } from '@/services/mybookingService';
 export default function MyBookings() {
   const [activeTab, setActiveTab] = useState<'active' | 'past'>('active');
   const [user, setUser] = useState(auth.currentUser);
   const [authChecked, setAuthChecked] = useState(!!auth.currentUser);
   
-  const { activeBookings, pastBookings, isLoading } = useData();
+  const { activeBookings, pastBookings, isLoading, refreshData } = useData();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -29,6 +30,26 @@ export default function MyBookings() {
 
   function handleBookNow() {
     router.push('/(tabs)/(home)/hotelList');
+  }
+
+  async function handleCancelBooking(bookingId: string) {
+    try {
+      await cancelBooking(bookingId);
+      await refreshData();
+    } catch (error) {
+      console.log('Failed to cancel booking:', error);
+      Alert.alert('Error', 'Could not cancel the booking.');
+    }
+  }
+
+  async function handleCompleteBooking(bookingId: string) {
+    try {
+      await completeBooking(bookingId);
+      await refreshData();
+    } catch (error) {
+      console.log('Failed to complete booking:', error);
+      Alert.alert('Error', 'Could not complete the booking.');
+    }
   }
 
   const renderCard = (item: any) => (
@@ -119,6 +140,38 @@ export default function MyBookings() {
             {item.status.toUpperCase()}
           </Text>
         </View>
+        {activeTab === 'active' && (
+          <View style={{ marginTop: 12 }}>
+            <TouchableOpacity
+              onPress={() => handleCompleteBooking(item.id)}
+              style={{
+                backgroundColor: '#1f4ba5',
+                borderRadius: 8,
+                alignItems: 'center',
+                paddingVertical: 11,
+                marginBottom: 8,
+              }}
+            >
+              <Text style={{ color: '#ffffff', fontSize: 13, fontWeight: '700' }}>
+                Complete Stay
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => handleCancelBooking(item.id)}
+              style={{
+                backgroundColor: '#d32f2f',
+                borderRadius: 8,
+                alignItems: 'center',
+                paddingVertical: 11,
+              }}
+            >
+              <Text style={{ color: '#ffffff', fontSize: 13, fontWeight: '700' }}>
+                Cancel Booking
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
     </View>
   );

@@ -1,4 +1,3 @@
-//import { getHotel } from "@/api/hotelService";
 import Message from "@/components/Banner";
 import FilterBar from "@/components/filterBar";
 import HotelListCard from "@/components/hotelList-card";
@@ -7,13 +6,13 @@ import InputSearch from "@/components/ui/inputSearch";
 import { gethotels } from "@/services/firebasehotelSource";
 import { useQuery } from "@tanstack/react-query";
 import * as React from 'react';
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { ActivityIndicator, MD2Colors } from 'react-native-paper';
 import { SafeAreaView } from "react-native-safe-area-context";
 export default function HotelList () { 
 
-  const { data=[], isLoading, error } = useQuery({
+  const { data, isLoading, error } = useQuery({
         queryKey: ["hotelList"],
         queryFn: gethotels,
         
@@ -21,8 +20,9 @@ export default function HotelList () {
 
 
  const [search, setSearch] = useState("");
-     const [newData, setNewData] = useState<any[]>([]);
- 
+     
+         const [typeSort, settypeSort] = useState("");
+
         const [price, setPrice] = useState(null);
         const [rating, setRating] = useState(null);
  
@@ -42,52 +42,85 @@ export default function HotelList () {
         setRating (number);
 
  }
-
-  useEffect(() => {
-setNewData(data?.filter((hotels: any) =>{
+ const filter=()=>{
+const filter2=data?.filter((hotels: any) =>{
         const filterSearch= (  search === "" ||hotels.country?.toLowerCase().includes(search.toLowerCase())||  hotels.city?.toLowerCase().includes(search.toLowerCase())||hotels.name?.toLowerCase().includes(search.toLowerCase()));  
           const filterprice=  (price===null ||hotels.price <= price  );
           const filterrating=(rating===null ||hotels.starRating >= rating &&(rating+1)>hotels.starRating   );
          
           return filterprice &&filterSearch&&filterrating
-  }));
-}, [search, price, rating, data]);
-  
-  
-   const  sortNameAToZ =()=>{
-       const   array= newData.slice();
-     const   sortAToZ  =   array?.sort((a:any,b:any)=>{
+  });
+  return filter2;
+ }
+  const  sortNameAToZ =(data:any)=>{
+      
+     return(  data?.sort((a:any,b:any)=>{
 
      return a.name.localeCompare(b.name);
 
    })
-   
-    setNewData(sortAToZ);
+  )
+    
   }
-
-     const  sortNameZToA =()=>{
-       const   array= newData.slice();
-     const   sortZToA  =   array?.sort((a:any,b:any)=>{
+   const  sortNameZToA =(data:any)=>{
+      
+     return(  data?.sort((a:any,b:any)=>{
 
      return b.name.localeCompare(a.name);
 
    })
-   
-    setNewData(sortZToA);
+  )
+    
   }
 
-
- const  sortRating =()=>{
-       const   array= newData.slice();
-     const   sortHotelsRating  =   array?.sort((a:any,b:any)=>{
+const  sortRating =(data:any)=>{
+     
+  return( data?.sort((a:any,b:any)=>{
 
      return b.starRating-a.starRating;
 
    })
+  )
    
-    setNewData(sortHotelsRating);
   }
 
+
+
+
+
+
+
+ const filteredData= useMemo(() => {
+ return filter();
+}, [search, price, rating, data]);
+  
+
+const finalData=useMemo<any>(()=>{
+  const result=filteredData;
+   if(typeSort==="A-Z"){
+      sortNameAToZ(result);
+   }
+    
+   if(typeSort==="Z-A"){
+    sortNameZToA(result);
+   }
+   if(typeSort==="rating"){
+    sortRating(result);
+   }
+
+return result;
+},[filteredData,typeSort])
+
+
+
+
+
+  
+  
+
+    
+
+ 
 
     if(isLoading) return(
 
@@ -102,7 +135,7 @@ setNewData(data?.filter((hotels: any) =>{
         </View>
     )
 
-  console.log(data);
+  
  
    
 
@@ -118,7 +151,7 @@ setNewData(data?.filter((hotels: any) =>{
         <View style={{marginTop:10}}>
         <InputSearch  placeholder={"search" } value={search}  onChangeText={handleSearch}   autoFocus={true} />
        
-            <FilterBar FilterPrice={FilterPrice}  FilterRating={FilterRating} sortNameAToZ={sortNameAToZ} sortNameZToA={sortNameZToA} sortRating={sortRating}/>
+            <FilterBar FilterPrice={FilterPrice}  FilterRating={FilterRating} settypeSort={settypeSort}/>
       </View>
       <Message 
        image={require('@/assets/images/iconBanner.png')}
@@ -131,7 +164,7 @@ setNewData(data?.filter((hotels: any) =>{
         <View >
         
 
-        { newData?.map((hotel:any)=>(
+        { finalData?.map((hotel:any)=>(
         <HotelListCard  key={hotel.id}  {...hotel} />
        
         ))}

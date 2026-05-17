@@ -7,13 +7,15 @@ import {
   query,
   updateDoc,
   where,
+  setDoc,
 } from 'firebase/firestore';
+
 import { Booking, CreateBookingPayload } from '../../types/booking';
-import { db } from '../firebaseconfig';
+import { db, auth } from '../firebaseconfig';
 
 function mapBooking(docSnap: any): Booking {
   const data = docSnap.data();
-  
+
   return {
     id: docSnap.id,
     userId: data.userId ?? '',
@@ -35,15 +37,26 @@ function mapBooking(docSnap: any): Booking {
   };
 }
 
-export async function getUserBookingsFromFirebase(userId: string): Promise<Booking[]> {
+export async function getUserBookingsFromFirebase(
+  userId: string
+): Promise<Booking[]> {
+
   const bookingsRef = collection(db, 'bookings');
-  const bookingsQuery = query(bookingsRef, where('userId', '==', userId));
+
+  const bookingsQuery = query(
+    bookingsRef,
+    where('userId', '==', userId)
+  );
+
   const snapshot = await getDocs(bookingsQuery);
-  
+
   return snapshot.docs.map(mapBooking);
 }
 
-export async function createBookingInFirebase(payload: CreateBookingPayload): Promise<string> {
+export async function createBookingInFirebase(
+  payload: CreateBookingPayload
+): Promise<string> {
+
   const docRef = await addDoc(collection(db, 'bookings'), {
     userId: payload.userId,
     hotelId: payload.hotelId,
@@ -57,27 +70,59 @@ export async function createBookingInFirebase(payload: CreateBookingPayload): Pr
     guests: payload.guests,
     roomType: payload.roomType,
     status: payload.status ?? 'pending',
-    paymentStatus: payload.paymentStatus,
-    paymentWay: payload.paymentWay,
-    totalPrice: payload.totalPrice,
+    paymentStatus: payload.paymentStatus ?? '',
+    paymentWay: payload.paymentWay ?? '',
+    totalPrice: payload.totalPrice ?? '',
     createdAt: new Date().toISOString(),
   });
-  
+
+  const user = auth.currentUser;
+
+  if (user) {
+
+    const userRef = doc(db, 'users', user.uid);
+
+    const userSnap = await getDoc(userRef);
+
+    const userData = userSnap.exists()
+      ? userSnap.data()
+      : {};
+
+    await setDoc(
+      userRef,
+      {
+        credits: (userData?.credits ?? 0) + 50,
+        rewardPoints: (userData?.rewardPoints ?? 0) + 10,
+        paymentMethod: payload.paymentWay ?? '',
+      },
+      { merge: true }
+    );
+  }
+
   return docRef.id;
 }
 
-export async function updateBookingInFirebase(bookingId: string, updates: Partial<Booking>): Promise<void> {
+export async function updateBookingInFirebase(
+  bookingId: string,
+  updates: Partial<Booking>
+): Promise<void> {
+
   const bookingRef = doc(db, 'bookings', bookingId);
+
   await updateDoc(bookingRef, updates);
 }
 
-export async function getBookingByIdFromFirebase(bookingId: string): Promise<Booking | null> {
+export async function getBookingByIdFromFirebase(
+  bookingId: string
+): Promise<Booking | null> {
+
   const bookingRef = doc(db, 'bookings', bookingId);
+
   const bookingSnap = await getDoc(bookingRef);
-  
+
   if (!bookingSnap.exists()) {
     return null;
   }
-  
+
   return mapBooking(bookingSnap);
 }

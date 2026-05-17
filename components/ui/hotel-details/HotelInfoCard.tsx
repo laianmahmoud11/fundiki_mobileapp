@@ -5,28 +5,30 @@ import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import { colors } from '@/constants/theme';
 import { Hotel } from '@/types/hotel';
 
-interface HotelInfoCardProps {
-  hotel: Hotel;
-}
+type HotelInfoCardProps ={
+hotel: Hotel;
+};
 
 const HotelInfoCard= ({ hotel }: HotelInfoCardProps) => {
+  const imageUri = Array.isArray(hotel?.image) ? hotel.image[0] : hotel?.image;
+
   return (
     <View style={styles.container}>
         <View style={styles.infoContainer}>
-        <Text style={styles.hotelName}>{hotel.name}</Text>
+        <Text style={styles.hotelName}>{hotel?.name}</Text>
         <View style={styles.ratingRow}>
-          <Text style={styles.ratingStars}>{hotel.starRating} </Text>
-          <Text style={styles.reviews}>{hotel.reviews}</Text>
+          <Text style={styles.ratingStars}>{hotel?.starRating} </Text>
+          <Text style={styles.reviews}>{hotel?.reviews}</Text>
         </View>
         <View style={styles.locationRow}>
           <Ionicons name="location-outline" size={18} color="#666" />
           <Text style={styles.locationText}>
-            {hotel.city}, {hotel.country}
+            {hotel?.city}, {hotel?.country}
           </Text>
         </View>
         
       </View>
-      <Image source={{ uri: hotel.image }} style={styles.heroImage} />
+      <Image source={imageUri ? { uri: imageUri } : undefined} style={styles.heroImage} />
     </View>
   );
 };
